@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import logging
 import sys
 from text_detection import get_text, NoTextDetectedException
