@@ -1,0 +1,9 @@
+__pycache__
+env
+geckodriver.log
+library_accessKeys.csv
+
+captcha.png
+output.png
+raw_captcha.jpeg
+config.py
