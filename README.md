@@ -11,10 +11,13 @@ log_stream_name = {instance_id}
 initial_position = start_of_file
 log_group_name = /var/log/app.log
 ```
+`sudo systemctl start awslogsd`  
+`sudo systemctl enable awslogsd.service`  
+
 `LOGFILE=/var/log/app.log`  
 `sudo touch $LOGFILE`  
 `sudo chmod o+w $LOGFILE`  
-`git clone https://github.com/zmunk/library-auto-reservation .`  
+`git clone https://github.com/zmunk/library-auto-reservation.git .`  
 `crontab -e`
 ```
 # run at 8 am every day
