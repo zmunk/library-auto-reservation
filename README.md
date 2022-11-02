@@ -1,6 +1,18 @@
 
 `sudo yum update -y`  
-`sudo yum install -y awslogs git python-pip`  
+`sudo yum install -y awslogs git`  
+
+sudo yum -y groupinstall "Development Tools"
+sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel
+wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
+tar zxvf Python-3.9.7.tgz
+cd Python-3.9.7/
+./configure 
+make
+sudo make altinstall
+cd ..
+
+
 ```
 # /etc/awslogs/awslogs.conf
 [/var/log/app.log]
@@ -31,8 +43,11 @@ credentials = [
 Access key ID,Secret access key
 ****,****
 ```
+`export AWS_DEFAULT_REGION=us-east-1`
 
-`pip3 install -r requirements.txt`  
+`python3.9 -m venv env`  
+`source env/bin/activate`  
+`pip install -r requirements.txt`  
 
 `crontab -e`
 ```
