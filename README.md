@@ -2,15 +2,15 @@
 `sudo yum update -y`  
 `sudo yum install -y awslogs git`  
 
-sudo yum -y groupinstall "Development Tools"
-sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel
-wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz
-tar zxvf Python-3.9.7.tgz
-cd Python-3.9.7/
-./configure 
-make
-sudo make altinstall
-cd ..
+`sudo yum -y groupinstall "Development Tools"`  
+`sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel`  
+`wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz`  
+`tar zxvf Python-3.9.7.tgz`  
+`cd Python-3.9.7/`  
+`./configure`  
+`make`  
+`sudo make altinstall`  
+`cd ..`  
 
 
 ```
@@ -44,6 +44,10 @@ Access key ID,Secret access key
 ****,****
 ```
 `export AWS_DEFAULT_REGION=us-east-1`
+
+`curl -LJO https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz`  
+`sudo tar -xf geckodriver-v0.32.0-linux64.tar.gz /usr/local/bin`  
+`rm geckodriver-v0.32.0-linux64.tar.gz`  
 
 `python3.9 -m venv env`  
 `source env/bin/activate`  
