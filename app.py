@@ -12,7 +12,7 @@ import time
 import base64
 import atexit
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import (WebDriverException, StaleElementReferenceException)
 from selenium.webdriver.support import expected_conditions as EC
@@ -88,7 +88,7 @@ class Date:
         return self._date.weekday() < 5
 
 
-class Driver(webdriver.Firefox):
+class Driver(webdriver.Chrome):
     LOGIN_URL = "https://kutuphane.uskudar.bel.tr/yordam/?p=2&dil=0&yazilim=yordam&devam=2f796f7264616d2f3f703d372664696c3d30"
 
     def __init__(self, name, username, password):
