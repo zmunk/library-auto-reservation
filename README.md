@@ -1,6 +1,7 @@
 
 `sudo yum update -y`  
 `sudo yum install -y awslogs git`  
+`sudo amazon-linux-extras install firefox`  
 
 `sudo yum -y groupinstall "Development Tools"`  
 `sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel`  
