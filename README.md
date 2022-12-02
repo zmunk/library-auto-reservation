@@ -1,18 +1,11 @@
 
 `sudo yum update -y`  
-`sudo yum install -y awslogs git`  
-`sudo amazon-linux-extras install firefox`  
-
+`sudo yum install -y awslogs git gcc openssl-devel bzip2-devel libffi-devel`  
 `sudo yum -y groupinstall "Development Tools"`  
-`sudo yum -y install gcc openssl-devel bzip2-devel libffi-devel`  
 `wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz`  
 `tar zxvf Python-3.9.7.tgz`  
-`cd Python-3.9.7/`  
-`./configure`  
-`make`  
-`sudo make altinstall`  
-`cd ..`  
-
+`(cd Python-3.9.7/ && ./configure && make && sudo make install)`  
+`sudo rm -r Python-3.9.7 Python-3.9.7.tgz`  
 
 ```
 # /etc/awslogs/awslogs.conf
@@ -30,6 +23,22 @@ log_group_name = /var/log/app.log
 `LOGFILE=/var/log/app.log`  
 `sudo touch $LOGFILE`  
 `sudo chmod o+w $LOGFILE`  
+
+`cd /tmp/`  
+`wget https://chromedriver.storage.googleapis.com/108.0.5359.71/chromedriver_linux64.zip`  
+`unzip -o chromedriver_linux64.zip`  
+`sudo mv chromedriver /usr/bin/chromedriver`  
+
+On local:  
+`wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb`  
+`sudo apt install ./google-chrome-stable_current_amd64.deb`  
+
+On cloud:  
+`curl https://intoli.com/install-google-chrome.sh | bash`  
+`sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome`  
+
+`cd ~`  
+
 `git clone https://github.com/zmunk/library-auto-reservation.git library`  
 
 `vim library/config.py`
@@ -46,13 +55,9 @@ Access key ID,Secret access key
 ```
 `export AWS_DEFAULT_REGION=us-east-1`
 
-`curl -LJO https://github.com/mozilla/geckodriver/releases/download/v0.32.0/geckodriver-v0.32.0-linux64.tar.gz`  
-`sudo tar -xf geckodriver-v0.32.0-linux64.tar.gz /usr/local/bin`  
-`rm geckodriver-v0.32.0-linux64.tar.gz`  
-
 `python3.9 -m venv env`  
 `source env/bin/activate`  
-`pip install -r requirements.txt`  
+`pip install -r library/requirements.txt`  
 
 `crontab -e`
 ```
