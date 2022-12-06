@@ -3,7 +3,7 @@
 import logging
 import sys
 from text_detection import get_text, NoTextDetectedException
-from config import credentials
+from config import credentials, DEV
 
 import re
 from datetime import datetime
@@ -97,6 +97,8 @@ class Driver(webdriver.Chrome):
         self.password = password
         options = Options()
         options.add_argument(f'--log-path={os.devnull}')
+        if not DEV:
+            options.add_argument('--headless')
         super().__init__(options=options)
 
     def login(self):
