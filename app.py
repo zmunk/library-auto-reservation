@@ -283,6 +283,8 @@ def main():
 
         driver.select_haluk_dursun()
 
+        time.sleep(5)  # TODO: replace with wait_for
+
         date_dropdown = driver.get_dropdown(Dropdown.DATE)
 
         available_weekdays = []
