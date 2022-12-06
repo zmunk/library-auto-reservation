@@ -33,6 +33,7 @@ reservation_regex = re.compile(
 
 DESIRED_TIMES = ['11', '13', '17', '19']
 DESIRED_SEATS = [
+    [ 148 ],
     [ 74, 81, 88, 95 ],
     [
         67, 69, 70, 72, 76, 77, 79,
