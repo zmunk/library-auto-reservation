@@ -1,11 +1,6 @@
 
 `sudo yum update -y`  
 `sudo yum install -y awslogs git gcc openssl-devel bzip2-devel libffi-devel`  
-`sudo yum -y groupinstall "Development Tools"`  
-`wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz`  
-`tar zxvf Python-3.9.7.tgz`  
-`(cd Python-3.9.7/ && ./configure && make && sudo make install)`  
-`sudo rm -r Python-3.9.7 Python-3.9.7.tgz`  
 
 ```
 # /etc/awslogs/awslogs.conf
@@ -24,40 +19,22 @@ log_group_name = /var/log/app.log
 `sudo touch $LOGFILE`  
 `sudo chmod o+w $LOGFILE`  
 
-`cd /tmp/`  
-`wget https://chromedriver.storage.googleapis.com/108.0.5359.71/chromedriver_linux64.zip`  
-`unzip -o chromedriver_linux64.zip`  
-`sudo mv chromedriver /usr/bin/chromedriver`  
-
-On local:  
-`wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb`  
-`sudo apt install ./google-chrome-stable_current_amd64.deb`  
-
-On cloud:  
-`curl https://intoli.com/install-google-chrome.sh | bash`  
-`sudo mv /usr/bin/google-chrome-stable /usr/bin/google-chrome`  
-
-`cd ~`  
-
 `git clone https://github.com/zmunk/library-auto-reservation.git library`  
-
-`vim library/config.py`
+`cd library`  
+`vim config.py`
 ```
+DEV = False
 credentials = [
     ("account1", "username1", "****"),
 ]
 ```
 
-`vim library/library_accessKeys.csv`
+`vim library_accessKeys.csv`
 ```
 Access key ID,Secret access key
 ****,****
 ```
-`export AWS_DEFAULT_REGION=us-east-1`
-
-`python3.9 -m venv env`  
-`source env/bin/activate`  
-`pip install -r library/requirements.txt`  
+`docker build . -t reservation && docker run reservation`  
 
 `crontab -e`
 ```
