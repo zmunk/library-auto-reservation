@@ -1,6 +1,6 @@
 
 `sudo yum update -y`  
-`sudo yum install -y awslogs git gcc openssl-devel bzip2-devel libffi-devel`  
+`sudo yum install -y awslogs git gcc openssl-devel bzip2-devel libffi-devel docker`
 
 ```
 # /etc/awslogs/awslogs.conf
@@ -34,12 +34,19 @@ credentials = [
 Access key ID,Secret access key
 ****,****
 ```
+
+`sudo usermod -aG docker ${USER}`  
+`newgrp docker`  
+`sudo systemctl start docker`  
+`sudo systemctl enable docker.service`  
 `docker build . -t reservation && docker run reservation`  
 
+`chmod +x run.sh`  
 `crontab -e`
 ```
 # run at 8 am every day
 0 8 * * * /home/ec2-user/library/run.sh
 ```
 
+Note: attach IAM role to instance  
 https://docs.amazonaws.cn/en_us/AmazonCloudWatch/latest/logs/QuickStartEC2Instance.html
