@@ -178,7 +178,7 @@ class Driver(webdriver.Chrome):
     def has_reservation(self) -> bool:
         return len(self.find_elements(By.CSS_SELECTOR, "div.toast-body>p")) != 0
 
-    def get_available_seats(self) -> dict[int, WebElement]:
+    def get_available_seats(self): # -> dict[int, WebElement]
         logger.debug(f"getting available seats...")
         time.sleep(4) # more than 1, less than 5
         available_seats_selector = "span.sandalye.musait"
@@ -192,7 +192,7 @@ class Driver(webdriver.Chrome):
             seats[num] = el
         return seats
 
-    def get_time_options(self) -> dict[str, tuple[str, int]]:
+    def get_time_options(self): # -> dict[str, tuple[str, int]]
         """
         e.g. {
             '00': ('00:00 - 06:00 Arası - [184]', 0),
@@ -212,10 +212,10 @@ class Driver(webdriver.Chrome):
             time_options[hour] = (o.text, int(count))
         return time_options
 
-    def get_available_weekdays(self) -> list[Date]:
+    def get_available_weekdays(self): # -> list[Date]
         date_dropdown = self.get_date_dropdown()
-        available_dates: list[Date] = []
-        available_weekdays: list[Date] = []
+        available_dates = [] # : list[Date]
+        available_weekdays = [] # : list[Date]
         for option in date_dropdown.options:
             date = Date(option.text)
             available_dates.append(date)
@@ -303,7 +303,7 @@ class Driver(webdriver.Chrome):
 
         self.reserve_seat(seat)
 
-    def find_a_seat(self) -> WebElement | None:
+    def find_a_seat(self): # -> WebElement | None
         available_seats = self.get_available_seats()
         logger.debug(f"available_seats = {[seat.num for seat in available_seats]}")
 
@@ -436,7 +436,7 @@ def reserve_all(accounts, already_reserved):
         # wait for page load
         time.sleep(5)
 
-        available_weekdays: list[Date] = driver.get_available_weekdays()
+        available_weekdays = driver.get_available_weekdays() # list[Date]
 
         if len(available_weekdays) == 0:
             logger.info(f'no available weekdays found')
