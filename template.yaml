@@ -9,6 +9,10 @@ Parameters:
   SecretAccessKey:
     Type: "String"
     Default: "Some secret"
+  LibraryUserName:
+    Type: "String"
+  LibraryUserPassword:
+    Type: "String"
 Resources:
   InstanceSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -112,12 +116,12 @@ Resources:
               content: !Sub |
                 DEV = False
                 credentials = [
-                  ("account1", "username1", "****"),
+                  ("account1", "${LibraryUserName}", "${LibraryUserPassword}"),
                 ]
             /etc/config/library_accessKeys.csv:
               content: !Sub |
                 Access key ID,Secret access key
-                ****,****
+                ${AccessKeyId},${SecretAccessKey}
             /etc/config/crontab:
               content: !Sub |
                 # run at 8 am every day
