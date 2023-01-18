@@ -1,0 +1,192 @@
+Parameters:
+  LatestAmiId:
+    Description: "AMI for EC2"
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2"
+  AccessKeyId:
+    Type: "String"
+    Default: "Some access key"
+  SecretAccessKey:
+    Type: "String"
+    Default: "Some secret"
+Resources:
+  InstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH and HTTP access via port 22 IPv4 & port 80 IPv4
+      SecurityGroupIngress:
+        - Description: 'Allow SSH IPv4 IN'
+          IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: '0.0.0.0/0'
+        - Description: 'Allow HTTP IPv4 IN'
+          IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: '0.0.0.0/0'
+  RootRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: "Configure instance for CloudWatch Logs"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+  CloudWatchLogsPermissionsPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: CloudWatchLogsPermissions
+      Roles:
+        - !Ref RootRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+              - 'logs:DescribeLogStreams'
+            Resource: "*"
+  RootInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref RootRole
+  Bucket:
+    Type: AWS::S3::Bucket
+  Instance:
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              git: []
+              awslogs: []
+              gcc: []
+              openssl-devel: []
+              bzip2-devel: []
+              libffi-devel: []
+              python-xvfbwrapper.noarch: []
+          sources:
+            /etc: "https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz"
+            /usr/bin: "https://chromedriver.storage.googleapis.com/108.0.5359.71/chromedriver_linux64.zip"
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackName}
+                region=${AWS::Region}
+                interval=1
+                verbose=true
+              mode: '000400'
+              owner: 'root'
+              group: 'root'
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.Instance.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource Instance --region ${AWS::Region}
+                runas=root
+              mode: '000400'
+              owner: 'root'
+              group: 'root'
+            /etc/config/awslogs.conf:
+              content: !Sub |
+                [/var/log/app.log]
+                datetime_format = %b %d %H:%M:%S
+                file = /var/log/app.log
+                buffer_duration = 5000
+                log_stream_name = {instance_id}
+                initial_position = start_of_file
+                log_group_name = /var/log/app.log
+            /etc/config/config.py:
+              content: !Sub |
+                DEV = False
+                credentials = [
+                  ("account1", "username1", "****"),
+                ]
+            /etc/config/library_accessKeys.csv:
+              content: !Sub |
+                Access key ID,Secret access key
+                ****,****
+            /etc/config/crontab:
+              content: !Sub |
+                # run at 8 am every day
+                0 8 * * * /etc/myapp/run.sh
+          commands:
+            a_createLogFile:
+              command: "touch /var/log/app.log"
+              test: "test ! -e /var/log/app.log"
+            b_chmodLogFile:
+              command: "chmod o+w /var/log/app.log"
+              test: "test -e /var/log/app.log"
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: "true"
+                ensureRunning: "true"
+                files:
+                  - /etc/cfn/cfn-hup.conf
+                  - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+              awslogsd:
+                enabled: "true"
+                ensureRunning: "true"
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
+    Properties:
+      InstanceType: "t2.micro"
+      ImageId: !Ref LatestAmiId
+      SecurityGroupIds:
+        - !Ref InstanceSecurityGroup
+      IamInstanceProfile: !Ref RootInstanceProfile
+      Tags:
+        - Key: Name
+          Value: Auto Reserver
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+
+          # cloudformation init
+          /opt/aws/bin/cfn-init -v --stack ${AWS::StackId} --resource Instance --region ${AWS::Region}
+
+          # install python
+          (cd /etc/Python-3.9.7/ && ./configure && make && make install)
+
+          # clone git repo
+          git clone https://github.com/zmunk/library-auto-reservation /etc/myapp
+
+          # install google chrome
+          curl https://intoli.com/install-google-chrome.sh | bash
+          mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+
+          # setup awslogs service
+          cat /etc/config/awslogs.conf >> /etc/awslogs/awslogs.conf
+          systemctl restart awslogsd
+
+          # setup crontab
+          crontab /etc/config/crontab
+
+          # copy library access keys and config.py
+          cp /etc/config/{library_accessKeys.csv,config.py} /etc/myapp/
+
+          # set run.sh executable
+          chmod +x /etc/myapp/run.sh
+
+          # setup python environment
+          (cd /etc/myapp/ && \
+          python3.9 -m venv env && \
+          source env/bin/activate && \
+          pip install -r requirements.txt)
+
+          # signal setup complete
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource Instance --region ${AWS::Region}

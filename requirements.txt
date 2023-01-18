@@ -11,6 +11,7 @@ outcome==1.2.0
 Pillow==9.2.0
 PySocks==1.7.1
 python-dateutil==2.8.2
+PyVirtualDisplay==3.0
 s3transfer==0.6.0
 selenium==4.5.0
 six==1.16.0

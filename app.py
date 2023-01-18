@@ -21,6 +21,7 @@ from selenium.common.exceptions import (
     ElementNotInteractableException)
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
+from pyvirtualdisplay.smartdisplay import SmartDisplay
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -94,8 +95,6 @@ class Driver(webdriver.Chrome):
         self.password = password
         options = Options()
         options.add_argument(f'--log-path={os.devnull}')
-        if not DEV:
-            options.add_argument('--headless')
         super().__init__(options=options)
 
     def login(self, close_panel=True):
@@ -305,7 +304,7 @@ class Driver(webdriver.Chrome):
 
     def find_a_seat(self): # -> WebElement | None
         available_seats = self.get_available_seats()
-        logger.debug(f"available_seats = {[seat.num for seat in available_seats]}")
+        logger.debug(f"available_seats = {available_seats.keys()}")
 
         for tier in DESIRED_SEATS:
             for num in tier:
@@ -521,4 +520,10 @@ def main():
 
 
 if __name__ == '__main__':
+    disp = None
+    if not DEV:
+        disp = SmartDisplay()
+        disp.start()
     main()
+    if disp:
+        disp.stop()
